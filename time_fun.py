@@ -3,8 +3,7 @@ from time import strftime, sleep
 
 
 def number_of_days(year):
-    if(year % 4 == 0 and year % 100 != 0 or
-       year % 100 == 0 and year % 400 == 0):
+    if(year % 4 == 0 and year % 100 != 0 or year % 400 == 0):
         return 366
     else:
         return 365
@@ -24,7 +23,7 @@ def convert_to_readable(date):
     day = round((date-year) * total_days)
 
     for i in sorted(list(months.values()))[::-1]:
-        if total_days == 366:
+        if total_days == 366 and i >= 59:
             i += 1
         if i >= day:
             continue
@@ -38,7 +37,7 @@ def convert_to_readable(date):
     day -= months[month]
 
     # Fix for leap years
-    if total_days == 366 and months[month] > 59:
+    if total_days == 366 and months[month] >= 59:
         day -= 1
 
     return month + " " + str(day) + ", " + str(year)
