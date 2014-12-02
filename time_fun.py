@@ -76,14 +76,11 @@ if __name__ == "__main__":
                          (months[month_stop]+day_stop)/total_stop_days)
             break
 
-    length = float(input("How long will the task take (in minutes)?: ")) * 60
+    # For now, this only takes integers; working on fix for decimals in
+    # devel
+    length = int(input("How long will the task take (in minutes)?: ")) * 60
 
-    # Allows for decimals in range function
-    step = 1
-    while (step*length) % 1 != 0:
-        step += 1
-
-    for i in range(0, int(step*length)+1, step):
+    for i in range(0, length+1):
         percentage = i/length
         date = get_date(current_date, stop_date, percentage)
         print(str(convert_to_readable(date)) +
