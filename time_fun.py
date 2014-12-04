@@ -1,5 +1,5 @@
-from math import e, log, floor
-from time import strftime, sleep
+from math import floor, e, log
+from time import sleep, strftime
 
 
 def number_of_days(year):
@@ -42,6 +42,25 @@ def convert_to_readable(date):
 
     return month + " " + str(day) + ", " + str(year)
 
+
+def get_task_time():
+    hours = get_number_of_seconds("hours", 2)
+    minutes = get_number_of_seconds("minutes", 1)
+    seconds = get_number_of_seconds("seconds", 0)
+    return hours + minutes + seconds
+
+
+def get_number_of_seconds(increment, exponent):
+    while True:
+        try:
+            seconds = (int(input("Enter length of the task in " + increment +
+                       ": ")))
+            assert seconds % 1 == 0
+        except(ValueError, AssertionError):
+            print("Not a valid input.")
+        else:
+            return seconds*60 ** exponent
+
 if __name__ == "__main__":
     day_of_year = int(strftime("%j"))
     year = int(strftime("%Y"))
@@ -76,12 +95,10 @@ if __name__ == "__main__":
                          (months[month_stop]+day_stop)/total_stop_days)
             break
 
-    # For now, this only takes integers; working on fix for decimals in
-    # devel
-    length = int(input("How long will the task take (in minutes)?: ")) * 60
+    length = get_task_time()
 
     for i in range(0, length+1):
-        percentage = i/length
+        percentage = i / length
         date = get_date(current_date, stop_date, percentage)
         print(str(convert_to_readable(date)) +
               " (" + str(percentage*100) + "%)")
