@@ -43,13 +43,6 @@ def convert_to_readable(date):
     return month + " " + str(day) + ", " + str(year)
 
 
-def get_task_time():
-    hours = get_number_of_seconds("hours", 2)
-    minutes = get_number_of_seconds("minutes", 1)
-    seconds = get_number_of_seconds("seconds", 0)
-    return hours + minutes + seconds
-
-
 def get_number_of_seconds(increment, exponent):
     while True:
         try:
@@ -95,7 +88,10 @@ if __name__ == "__main__":
                          (months[month_stop]+day_stop)/total_stop_days)
             break
 
-    length = get_task_time()
+    hours = get_number_of_seconds("hours", 2)
+    minutes = get_number_of_seconds("minutes", 1)
+    seconds = get_number_of_seconds("seconds", 0)
+    length = hours + minutes + seconds
 
     for i in range(0, length+1):
         percentage = i / length
