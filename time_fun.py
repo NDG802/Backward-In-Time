@@ -9,12 +9,55 @@ def number_of_days(year):
         return 365
 
 
+def stop_date_input(datetype, datatype):
+    value = None
+    while value is None:
+        try:
+            value = (datatype(input("Enter the " + datetype +
+                     " you wish to stop in: ")))
+            if datetype == "month" and value not in months:
+                raise ValueError
+        except ValueError:
+            value = None
+        else:
+            return value
+
+
+def get_current_date():
+    day_of_year = int(strftime("%j"))
+    year = int(strftime("%Y"))
+    total_current_days = number_of_days(year)
+
+    return year + day_of_year/total_current_days
+
+
+def get_stop_date():
+    year_stop = stop_date_input("year", int)
+    month_stop = stop_date_input("month", str)
+    day_stop = stop_date_input("day", int)
+
+    total_stop_days = number_of_days(year_stop)
+    if months[month_stop] >= 59 and total_stop_days == 366:
+        day_stop += 1
+    stop_date = year_stop + (months[month_stop]+day_stop)/total_stop_days
+    return stop_date
+
+
+def get_number_of_seconds(increment, exponent):
+    while True:
+        try:
+            seconds = (int(input("Enter length of the task in " + increment +
+                       ": ")))
+            assert seconds % 1 == 0
+        except(ValueError, AssertionError):
+            print("Not a valid input.")
+        else:
+            return seconds*60 ** exponent
+
+
 def get_date(current, stop, percentage):
-    return current - (e**(get_exp(current, stop)*percentage**3+3)-e**3)
-
-
-def get_exp(current, stop):
-    return log(current-stop+e**3) - 3
+    exponent = log(current-stop+e**3) - 3
+    return current - (e**(exponent*percentage**3+3)-e**3)
 
 
 def convert_to_readable(date):
@@ -43,50 +86,14 @@ def convert_to_readable(date):
     return month + " " + str(day) + ", " + str(year)
 
 
-def get_number_of_seconds(increment, exponent):
-    while True:
-        try:
-            seconds = (int(input("Enter length of the task in " + increment +
-                       ": ")))
-            assert seconds % 1 == 0
-        except(ValueError, AssertionError):
-            print("Not a valid input.")
-        else:
-            return seconds*60 ** exponent
-
 if __name__ == "__main__":
-    day_of_year = int(strftime("%j"))
-    year = int(strftime("%Y"))
-    total_current_days = number_of_days(year)
-
-    current_date = year + day_of_year/total_current_days
-
     months = {"January": 0, "February": 31, "March": 59,
               "April": 90, "May": 120, "June": 151,
               "July": 181, "August": 212, "September": 243,
               "October": 273, "November": 304, "December": 334}
 
-    # Main user input loop; gets stop year and percentage completed
-    year_stop = 0
-    month_stop = ""
-    day_stop = 0
-    while True:
-        try:
-            if not bool(year_stop):
-                year_stop = int(input("Enter the year you wish to stop in: "))
-            while month_stop not in months:
-                month_stop = input("Enter the month you wish to stop in: ")
-            if not bool(day_stop):
-                day_stop = int(input("Enter the day you wish to stop in: "))
-        except ValueError:
-            continue
-        else:
-            total_stop_days = number_of_days(year_stop)
-            if months[month_stop] >= 59 and total_stop_days == 366:
-                day_stop += 1
-            stop_date = (year_stop +
-                         (months[month_stop]+day_stop)/total_stop_days)
-            break
+    current_date = get_current_date()
+    stop_date = get_stop_date()
 
     hours = get_number_of_seconds("hours", 2)
     minutes = get_number_of_seconds("minutes", 1)
