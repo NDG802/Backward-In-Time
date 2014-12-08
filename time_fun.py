@@ -64,6 +64,11 @@ def convert_to_readable(date):
     year = floor(date)
     total_days = number_of_days(year)
     day = round((date-year) * total_days)
+    if day == 0:
+        day = 31
+        month = "December"
+        year -= 1
+        return month + " " + str(day) + ", " + str(year)
 
     for i in sorted(list(months.values()))[::-1]:
         if total_days == 366 and i >= 59:
