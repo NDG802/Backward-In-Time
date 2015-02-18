@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 from math import floor, e, log
-from time import sleep, strftime
+from time import sleep
 
 
 class Task(object):
