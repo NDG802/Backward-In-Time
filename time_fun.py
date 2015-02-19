@@ -36,8 +36,9 @@ class Task(object):
             try:
                 value = (int(input("Enter the " + datetype +
                          " you wish to stop in: ")))
-            except (ValueError):
-                print("Invalid input: date must be a number.")
+                assert value % 1 == 0 and value > 0
+            except (ValueError, AssertionError):
+                print("Invalid input: date must be a natural number.")
             else:
                 return value
 
@@ -49,9 +50,9 @@ class Task(object):
                 try:
                     seconds = (int(input("Enter length of the task in " +
                                t_unit + ": ")))
-                    assert seconds % 1 == 0
+                    assert seconds % 1 == 0 and seconds >= 0
                 except (ValueError, AssertionError):
-                    print("Invalid input: input must be an integer.")
+                    print("Invalid input: input must be a whole number.")
                 else:
                     nums.append(seconds * 60**exponent)
                     exponent -= 1
