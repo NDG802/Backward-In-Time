@@ -1,15 +1,43 @@
 from datetime import date, timedelta
+import getopt
 from math import floor, e, log
 from time import sleep
+import sys
 
 
 class Task(object):
-    def __init__(self):
+    def __init__(self, arguments):
+        try:
+            self.opts, self.args = (getopt.getopt(arguments, "Y:M:D:h:m:s:v",
+                                                  ["year=", "month=", "day=",
+                                                   "hours=", "minutes",
+                                                   "seconds=", "help",
+                                                   "verbose"]))
+        except getopt.GetoptError:
+            Task.usage()
+            sys.exit(2)
+
+        # Makes list of all flags used
+        self.flags = [self.opts[i][0] for i in range(0, len(self.opts))]
+        if '--help' in self.flags:
+            Task.help()
+
         self.get_start_date()
         self.get_stop_date()
         self.difference_in_dates = (self.start_date - self.stop_date).days
 
         self.get_task_length()
+
+    @staticmethod
+    def usage():
+        print("usage: time_fun.py -Y <year> -M <month> -D <day> " +
+              "-h <hours> -m <minutes> -s <seconds>")
+
+    @staticmethod
+    def help():
+        print("Backward In Time")
+        Task.usage()
+        sys.exit(0)
 
     def get_start_date(self):
         self.start_date = date.today()
@@ -20,44 +48,50 @@ class Task(object):
                                    (days_since_new_year/days_in_start_year))
 
     def get_stop_date(self):
-        self.stop_date = self.start_date + timedelta(days=1)
-        while self.stop_date > self.start_date:
-            try:
-                self.stop_date = (date(self.stop_date_input("year"),
-                                       self.stop_date_input("month"),
-                                       self.stop_date_input("day")))
-                if self.stop_date > self.start_date:
-                    print("Invalid input: date is in the future.")
-            except ValueError:
-                print("Invalid input: one or more values out of range.")
-
-    def stop_date_input(self, datetype):
-        while True:
-            try:
-                value = (int(input("Enter the " + datetype +
-                         " you wish to stop in: ")))
-                assert value % 1 == 0 and value > 0
-            except (ValueError, AssertionError):
-                print("Invalid input: date must be a natural number.")
-            else:
-                return value
+        year = month = day = None
+        for opt, arg in self.opts:
+            if opt == "-Y":
+                year = arg
+            elif opt == "-M":
+                month = arg
+            elif opt == "-D":
+                day = arg
+        if year is None or month is None or day is None:
+            Task.usage()
+            sys.exit(2)
+        try:
+            for i in [year, month, day]:
+                assert float(i) % 1 == 0 and int(i) > 0
+            self.stop_date = date(int(year), int(month), int(day))
+            if self.stop_date >= self.start_date:
+                raise ValueError
+        except AssertionError:
+            print("Error: date inputs must be natural numbers.")
+            sys.exit(2)
+        except ValueError:
+            print("Error: date out of range.")
+            sys.exit(2)
 
     def get_task_length(self):
-        nums = []
-        exponent = 2
-        for t_unit in ["hours", "minutes", "seconds"]:
-            while True:
-                try:
-                    seconds = (int(input("Enter length of the task in " +
-                               t_unit + ": ")))
-                    assert seconds % 1 == 0 and seconds >= 0
-                except (ValueError, AssertionError):
-                    print("Invalid input: input must be a whole number.")
-                else:
-                    nums.append(seconds * 60**exponent)
-                    exponent -= 1
-                    break
-        self.task_length = sum(nums)
+        hours, minutes, seconds = 0, 0, 0
+        for opt, arg in self.opts:
+            if opt == "-h":
+                hours = arg
+            elif opt == "-m":
+                minutes = arg
+            elif opt == "-s":
+                seconds = arg
+        try:
+            for i in [hours, minutes, seconds]:
+                assert float(i) % 1 == 0 and int(i) >= 0
+            self.task_length = (int(hours) * 60**2 + int(minutes) * 60 +
+                                int(seconds))
+            if self.task_length == 0:
+                print("Error: task length is required.")
+                sys.exit(2)
+        except (ValueError, AssertionError):
+            print("Error: inputs must be whole numbers.")
+            sys.exit(2)
 
     def progress(self):
         # exponent = ln(current-stop+e^3)-3
@@ -65,8 +99,12 @@ class Task(object):
         for i in range(0, self.task_length+1):
             self.percentage = i / self.task_length
             self.get_in_progress_date()
-            print(str(self.get_readable_date()) +
-                  " (" + str(self.percentage*100) + "%)")
+            output = (str(self.get_readable_date()).ljust(10) +
+                      (" (" + str(round(self.percentage*100, 2)) +
+                      "%)").center(10))
+            if "--verbose" in self.flags or "-v" in self.flags:
+                output += (" (" + str(self.in_progress_date) + ")").rjust(20)
+            print(output)
             sleep(1)
 
     def get_in_progress_date(self):
@@ -92,5 +130,5 @@ class Task(object):
 
 
 if __name__ == "__main__":
-    user_task = Task()
+    user_task = Task(sys.argv[1:])
     user_task.progress()
