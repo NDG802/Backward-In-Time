@@ -31,8 +31,7 @@ class Task(object):
             except ValueError:
                 print("Invalid input: one or more values out of range.")
 
-    @staticmethod
-    def stop_date_input(datetype):
+    def stop_date_input(self, datetype):
         while True:
             try:
                 value = (int(input("Enter the " + datetype +
