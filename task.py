@@ -28,6 +28,8 @@ class Task(object):
 
         self.get_task_length()
 
+        self.dates = []
+
     @staticmethod
     def usage():
         print("usage: time_fun.py -Y <year> -M <month> -D <day> " +
@@ -99,11 +101,13 @@ class Task(object):
         for i in range(0, self.task_length+1):
             self.percentage = i / self.task_length
             self.get_in_progress_date()
-            output = (str(self.get_readable_date()).ljust(10) +
+            self.get_readable_date()
+            output = (str(self.readable_date).ljust(10) +
                       (" (" + str(round(self.percentage*100, 2)) +
                       "%)").center(10))
             if "--verbose" in self.flags or "-v" in self.flags:
                 output += (" (" + str(self.in_progress_date) + ")").rjust(20)
+            self.dates.append([self.in_progress_date, self.readable_date])
             print(output)
             sleep(1)
 
@@ -118,8 +122,7 @@ class Task(object):
         total_days = self.number_of_days(year)
         day = round((self.in_progress_date-year) * total_days)
         start_point = date(year, 1, 1)
-        new_date = start_point + timedelta(days=day)
-        return new_date
+        self.readable_date = start_point + timedelta(days=day)
 
     @staticmethod
     def number_of_days(year):
